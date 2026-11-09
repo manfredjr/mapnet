@@ -71,6 +71,24 @@ public partial class SiteTestes
         Assert.True(quebrados.Count == 0, "Link interno quebrado: " + string.Join(", ", quebrados));
     }
 
+    [Fact]
+    public void Paginas_trazem_a_familia_map()
+    {
+        var publico = Path.Combine(CaracteresProibidosTestes.RaizDoRepositorio(), "public");
+        string[] outros = ["mapcache", "mapdesk", "mapdisk", "maphard"];
+
+        foreach (var pagina in Directory.EnumerateFiles(publico, "*.html"))
+        {
+            var texto = File.ReadAllText(pagina);
+            Assert.Contains("https://manfred.com.br/produtos#familia-map", texto);
+            Assert.All(outros, o => Assert.Contains($"https://{o}.manfred.com.br", texto));
+        }
+
+        var inicial = File.ReadAllText(Path.Combine(publico, "index.html"));
+        Assert.Contains("Faz parte da família MAP - MT", inicial);
+        Assert.Contains("Conteúdo deste site.", inicial);
+    }
+
     [GeneratedRegex(@"(?:href|src)=""(?!https?:|mailto:|#)([^""]+)""")]
     private static partial Regex LinkLocal();
 
